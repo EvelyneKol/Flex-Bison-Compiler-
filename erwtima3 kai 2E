@@ -7,10 +7,6 @@ ___________________BISON______________________________
 void yyerror(const char *s);
 int yylex(void);
 
-char** androidIds = NULL;
-int numAndroidIds = 0;
-
-
 extern FILE *yyin;
 extern FILE *yyout;
 extern int yylex();
@@ -27,21 +23,22 @@ extern int radioGroupExtra;
 extern int progress;
 extern int max_value;
 
+
+
 %}
 
-
-%token android_id
-%token android_layout_width
-%token android_layout_height
-%token android_orientation
-%token android_text
-%token android_textcolor
-%token android_src
-%token android_padding
-%token android_max
-%token android_progress
-%token android_radio_group_extra
-%token android_checkedButton
+%token ANDROID_ID
+%token ANDROID_LAYOUT_WIDTH
+%token ANDROID_LAYOUT_HEIGHT
+%token ANDROID_ORIENTATION
+%token ANDROID_TEXT
+%token ANDROID_TEXTCOLOR
+%token ANDROID_SRC
+%token ANDROID_PADDING
+%token ANDROID_MAX
+%token ANDROID_PROGRESS
+%token ANDROID_RADIO_GROUP_EXTRA
+%token ANDROID_CHECKEDBUTTON
 
 %token LINEAR_LAYOUT_START
 %token LINEAR_LAYOUT_STOP
@@ -69,19 +66,18 @@ extern int max_value;
 %token STR
 %token LWAGGER
 %token INT
-
 %%
 
-layout: LINEAR_LAYOUT_START EOL attributes7  LWAGGER EOL content EOL LINEAR_LAYOUT_STOP  {printf("\n\nCode parsed successfully\n");}
-																						   { printf("Number of RadioButtons: %d\n", RadioButtonCount1); }
+layout: LINEAR_LAYOUT_START EOL attributes7  LWAGGER EOL content EOL LINEAR_LAYOUT_STOP  {printf("\n\nCode parsed successfully(LinearLayout)\n");}
+                                                                                         { printf("Number of RadioButtons: %d\n", RadioButtonCount1); }
                                                                                        {  if ( radioGroupExtra != RadioButtonCount1) {
-																					   printf("\n android:radio_group_extra does not match RadioButtonCount1\n");
+                                                               printf("\n android:radio_group_extra does not match RadioButtonCount1\n");
                                                         } else {
                                                                printf("\n android:radio_group_extra matches RadioButtonCount1\n");
                                                         
                                                         
                                                         }}
-       | RELATIVE_LAYOUT_START EOL attributes8 LWAGGER EOL content EOL RELATIVE_LAYOUT_STOP{printf("\n\nCode parsed successfully(RelativeLayout)\n");}
+       | RELATIVE_LAYOUT_START EOL attributes8 LWAGGER EOL content EOL RELATIVE_LAYOUT_STOP {printf("\n\nCode parsed successfully(RelativeLayout)\n");}
                                                                                             { printf("Number of RadioButtons: %d\n", RadioButtonCount2); }
                                                                                             {  if ( radioGroupExtra != RadioButtonCount2) {
                                                                printf("\n android:radio_group_extra does not match RadioButtonCount2\n");
@@ -89,7 +85,7 @@ layout: LINEAR_LAYOUT_START EOL attributes7  LWAGGER EOL content EOL LINEAR_LAYO
                                                                printf("\n android:radio_group_extra matches RadioButtonCount2\n");
                                                         
                                                         
-                                                        }} 
+                                                        }}
       ;
 
 
@@ -127,7 +123,7 @@ text_view: TEXT_VIEW_START EOL attributes1 CLOSE_LWAGGER EOL
 image_view: IMAGE_VIEW_START EOL attributes2 CLOSE_LWAGGER EOL
           ;
 
-button: BUTTON_START attributes3 BUTTON_STOP
+button: RADIO_BUTTON_START attributes3 BUTTON_STOP
        ;
 
 radio_group: RADIO_GROUP_START EOL attributes4 LWAGGER EOL content2 EOL RADIO_GROUP_STOP
@@ -143,6 +139,7 @@ radio_button: RADIO_BUTTON_START EOL attributes5 CLOSE_LWAGGER  EOL
          ;
 
 progress_bar: PROGRESS_BAR_START EOL attributes6 {if (progress>=max_value || progress<0) {printf ("\nError android:progress is not between 0 and the value of android:max!"); YYABORT;} ;}CLOSE_LWAGGER EOL
+            ;
 
 
 attributes1:  /* empty */ 
@@ -185,196 +182,87 @@ attributes8:  /* empty */
           | attribute8 EOL attributes8
           ;
 
-
-attribute1: android_id STR
-{
-            // Check for uniqueness
-            for (int i = 0; i < numAndroidIds; i++) {
-                if (strcmp(yytext, androidIds[i]) == 0) {
-                    printf("Error: Duplicate android:id value '%s' at line %d\n", yytext, yylineno);
-                    exit(EXIT_FAILURE);
-                }
-            }
-
-            // Store the encountered android:id value
-            androidIds = realloc(androidIds, (numAndroidIds + 1) * sizeof(char*));
-            androidIds[numAndroidIds] = strdup(yytext);
-            numAndroidIds++;
-         }
-         | android_text STR
-         | android_textcolor STR
-         | android_layout_width STR
-         | android_layout_width INTEGER
-         | android_layout_height STR
-         | android_layout_height INTEGER
-         | android_orientation STR
+attribute1: ANDROID_ID STR
+         | ANDROID_TEXT STR
+         | ANDROID_TEXTCOLOR STR
+         | ANDROID_LAYOUT_WIDTH STR
+         | ANDROID_LAYOUT_WIDTH INT
+         | ANDROID_LAYOUT_HEIGHT STR
+         | ANDROID_LAYOUT_HEIGHT INT
+         | ANDROID_ORIENTATION STR
          ;
 
-attribute2: android_src STR
-         | android_id STR
-         {
-            // Check for uniqueness
-            for (int i = 0; i < numAndroidIds; i++) {
-                if (strcmp(yytext, androidIds[i]) == 0) {
-                    printf("Error: Duplicate android:id value '%s' at line %d\n", yytext, yylineno);
-                    exit(EXIT_FAILURE);
-                }
-            }
-
-            // Store the encountered android:id value
-            androidIds = realloc(androidIds, (numAndroidIds + 1) * sizeof(char*));
-            androidIds[numAndroidIds] = strdup(yytext);
-            numAndroidIds++;
-         }
-         | android_padding INTEGER
-         | android_padding STR
-         | android_layout_width STR
-         | android_layout_width INTEGER
-         | android_layout_height STR
-         | android_layout_height INTEGER
-         | android_orientation STR
+attribute2: ANDROID_SRC STR
+         | ANDROID_ID STR
+         | ANDROID_PADDING INT
+         | ANDROID_PADDING STR
+         | ANDROID_LAYOUT_WIDTH STR
+         | ANDROID_LAYOUT_WIDTH INT
+         | ANDROID_LAYOUT_HEIGHT STR
+         | ANDROID_LAYOUT_HEIGHT INT
+         | ANDROID_ORIENTATION STR
          ;
 
-attribute3: android_text STR
-         | android_id STR
-         {
-            // Check for uniqueness
-            for (int i = 0; i < numAndroidIds; i++) {
-                if (strcmp(yytext, androidIds[i]) == 0) {
-                    printf("Error: Duplicate android:id value '%s' at line %d\n", yytext, yylineno);
-                    exit(EXIT_FAILURE);
-                }
-            }
-
-            // Store the encountered android:id value
-            androidIds = realloc(androidIds, (numAndroidIds + 1) * sizeof(char*));
-            androidIds[numAndroidIds] = strdup(yytext);
-            numAndroidIds++;
-         }
-         | android_padding INTEGER
-         | android_padding STR
-         | android_layout_width STR
-         | android_layout_width INTEGER
-         | android_layout_height STR
-         | android_layout_height INTEGER
-         | android_orientation STR
+attribute3: ANDROID_TEXT STR
+         | ANDROID_ID STR
+         | ANDROID_PADDING INT
+         | ANDROID_PADDING STR
+         | ANDROID_LAYOUT_WIDTH STR
+         | ANDROID_LAYOUT_WIDTH INT
+         | ANDROID_LAYOUT_HEIGHT STR
+         | ANDROID_LAYOUT_HEIGHT INT
+         | ANDROID_ORIENTATION STR
          ;
 
-attribute4: android_text STR
-         | android_id STR
-         {
-            // Check for uniqueness
-            for (int i = 0; i < numAndroidIds; i++) {
-                if (strcmp(yytext, androidIds[i]) == 0) {
-                    printf("Error: Duplicate android:id value '%s' at line %d\n", yytext, yylineno);
-                    exit(EXIT_FAILURE);
-                }
-            }
-
-            // Store the encountered android:id value
-            androidIds = realloc(androidIds, (numAndroidIds + 1) * sizeof(char*));
-            androidIds[numAndroidIds] = strdup(yytext);
-            numAndroidIds++;
-         }
-         | android_layout_width STR
-         | android_layout_width INTEGER
-         | android_layout_height STR
-         | android_layout_height INTEGER
-         | android_orientation STR
-         | android_radio_group_extra INTEGER
+attribute4: ANDROID_TEXT STR
+         | ANDROID_ID STR
+         | ANDROID_LAYOUT_WIDTH STR
+         | ANDROID_LAYOUT_WIDTH INT
+         | ANDROID_LAYOUT_HEIGHT STR
+         | ANDROID_LAYOUT_HEIGHT INT
+         | ANDROID_ORIENTATION STR
+         | ANDROID_RADIO_GROUP_EXTRA INT {  radioGroupExtra = $2;  }
+                                                 
+                                                 
+           
          ;
 
-attribute5: android_text STR
-         | android_id STR
-         {
-            // Check for uniqueness
-            for (int i = 0; i < numAndroidIds; i++) {
-                if (strcmp(yytext, androidIds[i]) == 0) {
-                    printf("Error: Duplicate android:id value '%s' at line %d\n", yytext, yylineno);
-                    exit(EXIT_FAILURE);
-                }
-            }
-
-            // Store the encountered android:id value
-            androidIds = realloc(androidIds, (numAndroidIds + 1) * sizeof(char*));
-            androidIds[numAndroidIds] = strdup(yytext);
-            numAndroidIds++;
-         }
-         | android_layout_width STR
-         | android_layout_width INTEGER
-         | android_layout_height STR
-         | android_layout_height INTEGER
-         | android_orientation STR
+attribute5: ANDROID_TEXT STR
+         | ANDROID_ID STR
+         | ANDROID_LAYOUT_WIDTH STR
+         | ANDROID_LAYOUT_WIDTH INT
+         | ANDROID_LAYOUT_HEIGHT STR
+         | ANDROID_LAYOUT_HEIGHT INT
+         | ANDROID_ORIENTATION STR
          ;
 
-attribute6: android_id STR
-{
-            // Check for uniqueness
-            for (int i = 0; i < numAndroidIds; i++) {
-                if (strcmp(yytext, androidIds[i]) == 0) {
-                    printf("Error: Duplicate android:id value '%s' at line %d\n", yytext, yylineno);
-                    exit(EXIT_FAILURE);
-                }
-            }
-
-            // Store the encountered android:id value
-            androidIds = realloc(androidIds, (numAndroidIds + 1) * sizeof(char*));
-            androidIds[numAndroidIds] = strdup(yytext);
-            numAndroidIds++;
-         }
-         | android_progress INTEGER
-         | android_max INTEGER
-         | android_layout_width STR
-         | android_layout_width INTEGER
-         | android_layout_height STR
-         | android_layout_height INTEGER
-         | android_orientation STR
+attribute6: ANDROID_ID STR
+         | ANDROID_PROGRESS INT {progress=$2;}
+         | ANDROID_MAX INT {max_value=$2;}
+         | ANDROID_LAYOUT_WIDTH STR
+         | ANDROID_LAYOUT_WIDTH INT
+         | ANDROID_LAYOUT_HEIGHT STR
+         | ANDROID_LAYOUT_HEIGHT INT
+         | ANDROID_ORIENTATION STR
          ;
 
-attribute7: android_id STR
-{
-            // Check for uniqueness
-            for (int i = 0; i < numAndroidIds; i++) {
-                if (strcmp(yytext, androidIds[i]) == 0) {
-                    printf("Error: Duplicate android:id value '%s' at line %d\n", yytext, yylineno);
-                    exit(EXIT_FAILURE);
-                }
-            }
-
-            // Store the encountered android:id value
-            androidIds = realloc(androidIds, (numAndroidIds + 1) * sizeof(char*));
-            androidIds[numAndroidIds] = strdup(yytext);
-            numAndroidIds++;
-         }
-          | android_orientation STR
-         | android_layout_width STR
-         | android_layout_width INTEGER
-         | android_layout_height STR
-         | android_layout_height INTEGER
+attribute7: ANDROID_ID STR
+          | ANDROID_ORIENTATION STR
+         | ANDROID_LAYOUT_WIDTH STR
+         | ANDROID_LAYOUT_WIDTH INT
+         | ANDROID_LAYOUT_HEIGHT STR
+         | ANDROID_LAYOUT_HEIGHT INT
          ;
 
 
-  attribute8: android_id STR
-  {
-            // Check for uniqueness
-            for (int i = 0; i < numAndroidIds; i++) {
-                if (strcmp(yytext, androidIds[i]) == 0) {
-                    printf("Error: Duplicate android:id value '%s' at line %d\n", yytext, yylineno);
-                    exit(EXIT_FAILURE);
-                }
-            }
-
-            // Store the encountered android:id value
-            androidIds = realloc(androidIds, (numAndroidIds + 1) * sizeof(char*));
-            androidIds[numAndroidIds] = strdup(yytext);
-            numAndroidIds++;
-         }
-         | android_layout_width STR
-         | android_layout_width INTEGER
-         | android_layout_height STR
-         | android_layout_height INTEGER
+  attribute8: ANDROID_ID STR
+         | ANDROID_LAYOUT_WIDTH STR
+         | ANDROID_LAYOUT_WIDTH INT
+         | ANDROID_LAYOUT_HEIGHT STR
+         | ANDROID_LAYOUT_HEIGHT INT
          
          ;       
+    
 
        
 
@@ -389,31 +277,25 @@ EOL: /* nothing */
 
 void yyerror(const char *s)
 {
-	printf("\n\nerror: %s\n ", s);
-	printf("\n");
+       printf("\n\nerror: %s\n ", s);
+       printf("\n");
         printf("Line %d: %s\n", yylineno, yytext);
 }
 
 
 int main(int argc, char **argv)
 {
-	++argv; --argc;
-	
-	if(argc > 0)
-		yyin = fopen(argv[0], "r");
-	else
-		yyin = stdin;
-		
-	yyout = stdout;
-	
-	yyparse();
-
-    for (int i = 0; i < numAndroidIds; i++) {
-        free(androidIds[i]);
-    }
-    free(androidIds);
-    
-	return 0;
+       ++argv; --argc;
+       
+       if(argc > 0)
+              yyin = fopen(argv[0], "r");
+       else
+              yyin = stdin;
+              
+       yyout = stdout;
+       
+       yyparse();
+       return 0;
 }
 
 ___________________FLEX________________
@@ -463,18 +345,18 @@ propertyC	{word}[.]{word}
 "</RadioButton>"                {token_print(RADIO_BUTTON_STOP); return RADIO_BUTTON_STOP; }
 "<ProgressBar"                  {token_print(PROGRESS_BAR_START); return PROGRESS_BAR_START; }
 "</ProgressBar>"                {token_print(PROGRESS_BAR_STOP); return PROGRESS_BAR_STOP; }
-"android:id="                   {token_print(android_id); return android_id; }
-"android:layout_width="         {token_print(android_layout_width);return android_layout_width; }
-"android:layout_height="        {token_print(android_layout_height); return android_layout_height; }
-"android:orientation="          {token_print(android_orientation); return android_orientation; }
-"android:text="                 {token_print(android_text); return android_text; }
-"android:textColor="            {token_print(android_textcolor); return android_textcolor; }
-"android:src="                  {token_print(android_src); return android_src; }
-"android:padding="              {token_print(android_padding); return android_padding; }
-"android:max="                  {token_print(android_max); return android_max; }
-"android:progress="             {token_print(android_progress); return android_progress; }
-"android:checkedButton="        {token_print(android_checkedButton); return android_checkedButton; }
-"android:radio_group_extra"     {token_print(android_radio_group_extra); return android_radio_group_extra; }
+"android:id="                   {token_print(ANDROID_ID); return ANDROID_ID; }
+"android:layout_width=" 		{token_print(ANDROID_LAYOUT_WIDTH); return ANDROID_LAYOUT_WIDTH; }
+"android:layout_height=" 		{token_print(ANDROID_LAYOUT_HEIGHT); return ANDROID_LAYOUT_HEIGHT; }
+"android:orientation=" 			{token_print(ANDROID_ORIENTATION); return ANDROID_ORIENTATION; }
+"android:text=" 				{token_print(ANDROID_TEXT); return ANDROID_TEXT; }
+"android:textColor=" 			{token_print(ANDROID_TEXTCOLOR); return ANDROID_TEXTCOLOR; }
+"android:src=" 					{token_print(ANDROID_SRC); return ANDROID_SRC; }
+"android:padding=" 				{token_print(ANDROID_PADDING); return ANDROID_PADDING; }
+"android:max=" 					{token_print(ANDROID_MAX); return ANDROID_MAX; }
+"android:progress=" 			{token_print(ANDROID_PROGRESS); return ANDROID_PROGRESS; }
+"android:checkedButton=" 		{token_print(ANDROID_CHECKEDBUTTON); return ANDROID_CHECKEDBUTTON; }
+"android:radio_group_extra="    {token_print(ANDROID_RADIO_GROUP_EXTRA); return ANDROID_RADIO_GROUP_EXTRA; }
 ["]{word}["]				    {printf("%s", yytext); return STR;}
 ">"                             {token_print(LWAGGER); return LWAGGER;}
 "/>"                            {token_print(CLOSE_LWAGGER); return CLOSE_LWAGGER;}
