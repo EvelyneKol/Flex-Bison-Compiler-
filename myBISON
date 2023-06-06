@@ -64,8 +64,8 @@ extern int id_line;
 
 %%
 
-layout: LINEAR_LAYOUT_START EOL attributes7  LWAGGER EOL content EOL LINEAR_LAYOUT_STOP  {printf("\n\nCode parsed successfully(LinearLayout)\n");}
-       | RELATIVE_LAYOUT_START EOL attributes8 LWAGGER EOL content EOL RELATIVE_LAYOUT_STOP {printf("\n\nCode parsed successfully(RelativeLayout)\n");}
+layout: LINEAR_LAYOUT_START EOL attributes7  LWAGGER EOL content EOL LINEAR_LAYOUT_STOP  {printf("\n\nCode parsed successfully\n");}
+       | RELATIVE_LAYOUT_START EOL attributes8 LWAGGER EOL content EOL RELATIVE_LAYOUT_STOP 
       ;
 
 
@@ -386,5 +386,4 @@ int main(int argc, char **argv)
     
 	return 0;
 }
-
 
