@@ -7,6 +7,10 @@ ___________________BISON______________________________
 void yyerror(const char *s);
 int yylex(void);
 
+
+char** androidIds = NULL;
+int numAndroidIds = 0;
+
 extern FILE *yyin;
 extern FILE *yyout;
 extern int yylex();
@@ -277,26 +281,33 @@ EOL: /* nothing */
 
 void yyerror(const char *s)
 {
-       printf("\n\nerror: %s\n ", s);
-       printf("\n");
+	printf("\n\nerror: %s\n ", s);
+	printf("\n");
         printf("Line %d: %s\n", yylineno, yytext);
 }
 
 
 int main(int argc, char **argv)
 {
-       ++argv; --argc;
-       
-       if(argc > 0)
-              yyin = fopen(argv[0], "r");
-       else
-              yyin = stdin;
-              
-       yyout = stdout;
-       
-       yyparse();
-       return 0;
+	++argv; --argc;
+	
+	if(argc > 0)
+		yyin = fopen(argv[0], "r");
+	else
+		yyin = stdin;
+		
+	yyout = stdout;
+	
+	yyparse();
+
+    for (int i = 0; i < numAndroidIds; i++) {
+        free(androidIds[i]);
+    }
+    free(androidIds);
+    
+	return 0;
 }
+
 
 ___________________FLEX________________
 
