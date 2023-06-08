@@ -1,1 +1,386 @@
+%{
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
+void yyerror(const char *s);
+int yylex(void);
+
+
+char** androidIds = NULL;
+int numAndroidIds = 0;
+
+extern FILE *yyin;
+extern FILE *yyout;
+extern int yylex();
+extern int yyparse();
+extern int yylineno;
+extern char *yytext;
+extern int yylval;
+extern int lines;
+extern int id_line;
+
+
+
+%}
+%token ANDROID_ID
+%token ANDROID_LAYOUT_WIDTH
+%token ANDROID_LAYOUT_HEIGHT
+%token ANDROID_ORIENTATION
+%token ANDROID_TEXT
+%token ANDROID_TEXTCOLOR
+%token ANDROID_SRC
+%token ANDROID_PADDING
+%token ANDROID_MAX
+%token ANDROID_PROGRESS
+%token ANDROID_RADIO_GROUP_EXTRA
+%token ANDROID_CHECKEDBUTTON
+
+%token LINEAR_LAYOUT_START
+%token LINEAR_LAYOUT_STOP
+%token RELATIVE_LAYOUT_START
+%token RELATIVE_LAYOUT_STOP
+%token TEXT_VIEW_START
+%token TEXT_VIEW_STOP
+%token CLOSE_TEXT_VIEW
+%token IMAGE_VIEW_START
+%token IMAGE_VIEW_STOP
+%token BUTTON_START
+%token BUTTON_STOP
+%token RADIO_GROUP_START
+%token RADIO_GROUP_STOP
+%token RADIO_BUTTON_START
+%token RADIO_BUTTON_STOP
+%token PROGRESS_BAR_START
+%token PROGRESS_BAR_STOP
+%token CLOSE_LWAGGER
+%token NL
+%token STRING
+%token VALUE
+%token INTEGER FLOAT 
+%token TRUE FALSE
+%token STR
+%token LWAGGER
+%token INT
+%%
+
+layout: LINEAR_LAYOUT_START EOL attributes7  LWAGGER EOL content EOL LINEAR_LAYOUT_STOP  
+       | RELATIVE_LAYOUT_START EOL attributes8 LWAGGER EOL content EOL RELATIVE_LAYOUT_STOP 
+      ;
+
+
+
+content: /* empty */ 
+       | element 
+       | element EOL content
+       ;
+
+element: text_view
+       | image_view
+       | button
+       | radio_group
+       | progress_bar
+       | layout
+       ;
+
+content2: /* empty */ 
+       | element2 
+       | element2 EOL content2  
+       ;
+
+element2: text_view
+       | image_view
+       | button
+       | radio_group
+       | progress_bar
+       | radio_button
+       | layout
+       ;
+
+text_view: TEXT_VIEW_START EOL attributes1 CLOSE_LWAGGER EOL 
+         ;
+
+image_view: IMAGE_VIEW_START EOL attributes2 CLOSE_LWAGGER EOL
+          ;
+
+button: RADIO_BUTTON_START attributes3 BUTTON_STOP
+       ;
+
+radio_group: RADIO_GROUP_START EOL attributes4 LWAGGER EOL content2 EOL RADIO_GROUP_STOP
+            ;
+
+radio_button: RADIO_BUTTON_START EOL attributes5 CLOSE_LWAGGER  EOL
+         ;
+
+progress_bar: PROGRESS_BAR_START EOL attributes6 CLOSE_LWAGGER EOL
+            ;
+
+
+attributes1:  /* empty */ 
+          | attribute1
+          | attribute1 EOL attributes1
+          ;
+
+attributes2:  /* empty */ 
+          | attribute2 
+          | attribute2 EOL attributes2
+          ;
+
+attributes3:  /* empty */ 
+          | attribute3 
+          | attribute3 EOL attributes3
+          ;
+
+attributes4:  /* empty */ 
+          | attribute4 
+          | attribute4 EOL attributes4
+          ;
+
+attributes5:  /* empty */ 
+          | attribute5 
+          | attribute5 EOL attributes5
+          ;
+
+attributes6:  /* empty */ 
+          | attribute6 
+          | attribute6 EOL attributes6
+          ;
+
+attributes7:  /* empty */ 
+          | attribute7 
+          | attribute7 EOL attributes7
+          ;
+
+attributes8:  /* empty */ 
+          | attribute8 
+          | attribute8 EOL attributes8
+          ;
+
+attribute1: ANDROID_ID STR
+{
+            // Check for uniqueness
+            for (int i = 0; i < numAndroidIds; i++) {
+                if (strcmp(yytext, androidIds[i]) == 0) {
+                    printf("Error: Duplicate android:id value '%s' at line %d\n", yytext, yylineno);
+                    exit(EXIT_FAILURE);
+                }
+            }
+
+            // Store the encountered android:id value
+            androidIds = realloc(androidIds, (numAndroidIds + 1) * sizeof(char*));
+            androidIds[numAndroidIds] = strdup(yytext);
+            numAndroidIds++;
+         }
+         | ANDROID_TEXT STR
+         | ANDROID_TEXTCOLOR STR
+         | ANDROID_LAYOUT_WIDTH STR
+         | ANDROID_LAYOUT_WIDTH INT
+         | ANDROID_LAYOUT_HEIGHT STR
+         | ANDROID_LAYOUT_HEIGHT INT
+         | ANDROID_ORIENTATION STR
+         ;
+
+attribute2: ANDROID_SRC STR
+         | ANDROID_ID STR
+         {
+            // Check for uniqueness
+            for (int i = 0; i < numAndroidIds; i++) {
+                if (strcmp(yytext, androidIds[i]) == 0) {
+                    printf("Error: Duplicate android:id value '%s' at line %d\n", yytext, yylineno);
+                    exit(EXIT_FAILURE);
+                }
+            }
+
+            // Store the encountered android:id value
+            androidIds = realloc(androidIds, (numAndroidIds + 1) * sizeof(char*));
+            androidIds[numAndroidIds] = strdup(yytext);
+            numAndroidIds++;
+         }
+         | ANDROID_PADDING INT
+         | ANDROID_PADDING STR
+         | ANDROID_LAYOUT_WIDTH STR
+         | ANDROID_LAYOUT_WIDTH INT
+         | ANDROID_LAYOUT_HEIGHT STR
+         | ANDROID_LAYOUT_HEIGHT INT
+         | ANDROID_ORIENTATION STR
+         ;
+
+attribute3: ANDROID_TEXT STR
+         | ANDROID_ID STR
+         {
+            // Check for uniqueness
+            for (int i = 0; i < numAndroidIds; i++) {
+                if (strcmp(yytext, androidIds[i]) == 0) {
+                    printf("Error: Duplicate android:id value '%s' at line %d\n", yytext, yylineno);
+                    exit(EXIT_FAILURE);
+                }
+            }
+
+            // Store the encountered android:id value
+            androidIds = realloc(androidIds, (numAndroidIds + 1) * sizeof(char*));
+            androidIds[numAndroidIds] = strdup(yytext);
+            numAndroidIds++;
+         }
+         | ANDROID_PADDING INT
+         | ANDROID_PADDING STR
+         | ANDROID_LAYOUT_WIDTH STR
+         | ANDROID_LAYOUT_WIDTH INT
+         | ANDROID_LAYOUT_HEIGHT STR
+         | ANDROID_LAYOUT_HEIGHT INT
+         | ANDROID_ORIENTATION STR
+         ;
+
+attribute4: ANDROID_TEXT STR
+         | ANDROID_ID STR
+         {
+            // Check for uniqueness
+            for (int i = 0; i < numAndroidIds; i++) {
+                if (strcmp(yytext, androidIds[i]) == 0) {
+                    printf("Error: Duplicate android:id value '%s' at line %d\n", yytext, yylineno);
+                    exit(EXIT_FAILURE);
+                }
+            }
+
+            // Store the encountered android:id value
+            androidIds = realloc(androidIds, (numAndroidIds + 1) * sizeof(char*));
+            androidIds[numAndroidIds] = strdup(yytext);
+            numAndroidIds++;
+         }
+         | ANDROID_LAYOUT_WIDTH STR
+         | ANDROID_LAYOUT_WIDTH INT
+         | ANDROID_LAYOUT_HEIGHT STR
+         | ANDROID_LAYOUT_HEIGHT INT
+         | ANDROID_ORIENTATION STR
+         | ANDROID_RADIO_GROUP_EXTRA INT {  radioGroupExtra = $2;  }
+                                                 
+                                                 
+           
+         ;
+
+attribute5: ANDROID_TEXT STR
+         | ANDROID_ID STR
+         {
+            // Check for uniqueness
+            for (int i = 0; i < numAndroidIds; i++) {
+                if (strcmp(yytext, androidIds[i]) == 0) {
+                    printf("Error: Duplicate android:id value '%s' at line %d\n", yytext, yylineno);
+                    exit(EXIT_FAILURE);
+                }
+            }
+
+            // Store the encountered android:id value
+            androidIds = realloc(androidIds, (numAndroidIds + 1) * sizeof(char*));
+            androidIds[numAndroidIds] = strdup(yytext);
+            numAndroidIds++;
+         }
+         | ANDROID_LAYOUT_WIDTH STR
+         | ANDROID_LAYOUT_WIDTH INT
+         | ANDROID_LAYOUT_HEIGHT STR
+         | ANDROID_LAYOUT_HEIGHT INT
+         | ANDROID_ORIENTATION STR
+         ;
+
+attribute6: ANDROID_ID STR
+{
+            // Check for uniqueness
+            for (int i = 0; i < numAndroidIds; i++) {
+                if (strcmp(yytext, androidIds[i]) == 0) {
+                    printf("Error: Duplicate android:id value '%s' at line %d\n", yytext, yylineno);
+                    exit(EXIT_FAILURE);
+                }
+            }
+
+            // Store the encountered android:id value
+            androidIds = realloc(androidIds, (numAndroidIds + 1) * sizeof(char*));
+            androidIds[numAndroidIds] = strdup(yytext);
+            numAndroidIds++;
+         }
+         | ANDROID_PROGRESS INT {progress=$2;}
+         | ANDROID_MAX INT {max_value=$2;}
+         | ANDROID_LAYOUT_WIDTH STR
+         | ANDROID_LAYOUT_WIDTH INT
+         | ANDROID_LAYOUT_HEIGHT STR
+         | ANDROID_LAYOUT_HEIGHT INT
+         | ANDROID_ORIENTATION STR
+         ;
+
+attribute7: ANDROID_ID STR
+{
+            // Check for uniqueness
+            for (int i = 0; i < numAndroidIds; i++) {
+                if (strcmp(yytext, androidIds[i]) == 0) {
+                    printf("Error: Duplicate android:id value '%s' at line %d\n", yytext, yylineno);
+                    exit(EXIT_FAILURE);
+                }
+            }
+
+            // Store the encountered android:id value
+            androidIds = realloc(androidIds, (numAndroidIds + 1) * sizeof(char*));
+            androidIds[numAndroidIds] = strdup(yytext);
+            numAndroidIds++;
+         }
+          | ANDROID_ORIENTATION STR
+         | ANDROID_LAYOUT_WIDTH STR
+         | ANDROID_LAYOUT_WIDTH INT
+         | ANDROID_LAYOUT_HEIGHT STR
+         | ANDROID_LAYOUT_HEIGHT INT
+         ;
+
+
+  attribute8: ANDROID_ID STR
+  {
+            // Check for uniqueness
+            for (int i = 0; i < numAndroidIds; i++) {
+                if (strcmp(yytext, androidIds[i]) == 0) {
+                    printf("Error: Duplicate android:id value '%s' at line %d\n", yytext, yylineno);
+                    exit(EXIT_FAILURE);
+                }
+            }
+
+            // Store the encountered android:id value
+            androidIds = realloc(androidIds, (numAndroidIds + 1) * sizeof(char*));
+            androidIds[numAndroidIds] = strdup(yytext);
+            numAndroidIds++;
+         }
+         | ANDROID_LAYOUT_WIDTH STR
+         | ANDROID_LAYOUT_WIDTH INT
+         | ANDROID_LAYOUT_HEIGHT STR
+         | ANDROID_LAYOUT_HEIGHT INT
+         
+         ;       
+
+EOL: /* nothing */
+   | NL EOL
+   ; 
+
+
+%%
+
+void yyerror(const char *s)
+{
+	printf("\n\nerror: %s\n ", s);
+	printf("\n");
+        printf("Line %d: %s\n", yylineno, yytext);
+}
+
+
+int main(int argc, char **argv)
+{
+	++argv; --argc;
+	
+	if(argc > 0)
+		yyin = fopen(argv[0], "r");
+	else
+		yyin = stdin;
+		
+	yyout = stdout;
+	
+	yyparse();
+
+    for (int i = 0; i < numAndroidIds; i++) {
+        free(androidIds[i]);
+    }
+    free(androidIds);
+    
+	return 0;
+}
