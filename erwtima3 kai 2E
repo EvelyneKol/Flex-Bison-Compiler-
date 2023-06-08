@@ -28,7 +28,6 @@ extern int progress;
 extern int max_value;
 
 
-
 %}
 
 %token ANDROID_ID
