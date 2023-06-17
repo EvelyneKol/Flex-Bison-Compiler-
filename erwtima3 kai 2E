@@ -251,7 +251,6 @@ attribute3: ANDROID_TEXT STR
             numAndroidIds++;
          }
          | ANDROID_PADDING INT
-         | ANDROID_PADDING STR
          | ANDROID_LAYOUT_WIDTH STR
          | ANDROID_LAYOUT_WIDTH INT
          | ANDROID_LAYOUT_HEIGHT STR
