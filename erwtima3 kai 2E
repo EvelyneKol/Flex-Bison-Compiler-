@@ -26,6 +26,7 @@ extern int RadioButtonCount2;
 extern int radioGroupExtra;
 extern int progress;
 extern int max_value;
+extern int AndroidPadding;
 
 
 %}
@@ -42,7 +43,6 @@ extern int max_value;
 %token ANDROID_PROGRESS
 %token ANDROID_RADIO_GROUP_EXTRA
 %token ANDROID_CHECKEDBUTTON
-
 %token LINEAR_LAYOUT_START
 %token LINEAR_LAYOUT_STOP
 %token RELATIVE_LAYOUT_START
@@ -72,20 +72,21 @@ extern int max_value;
 %%
 
 layout: LINEAR_LAYOUT_START EOL attributes7  LWAGGER EOL content EOL LINEAR_LAYOUT_STOP  {printf("\n\nCode parsed successfully\n");}
-                                                                                         { printf("Number of RadioButtons: %d\n", RadioButtonCount1); }
-                                                                                       {  if ( radioGroupExtra != RadioButtonCount1) {
-                                                               printf("\n android:radio_group_extra does not match RadioButtonCount1\n");
+                                                                                         {printf("Number of <RadioButton/>: %d\n", RadioButtonCount1); }
+                                                                                         {if(radioGroupExtra != RadioButtonCount1) 
+											 	{
+                                                               					printf("\n Error!!! Value of android:radio_group_extra does not match RadioButtonCount1!\n");
                                                         } else {
-                                                               printf("\n android:radio_group_extra matches RadioButtonCount1\n");
+                                                               printf("\n Value of android:radio_group_extra matches RadioButtonCount1\n");
                                                         
                                                         
                                                         }}
        | RELATIVE_LAYOUT_START EOL attributes8 LWAGGER EOL content EOL RELATIVE_LAYOUT_STOP 
-                                                                                            { printf("Number of RadioButtons: %d\n", RadioButtonCount2); }
+                                                                                            { printf("Number of <RadioButton/>: %d\n", RadioButtonCount2); }
                                                                                             {  if ( radioGroupExtra != RadioButtonCount2) {
-                                                               printf("\n android:radio_group_extra does not match RadioButtonCount2\n");
+                                                               printf("\n Error!!! Value of android:radio_group_extra does not match RadioButtonCount2\n");
                                                         } else {
-                                                               printf("\n android:radio_group_extra matches RadioButtonCount2\n");
+                                                               printf("\n Value of android:radio_group_extra matches RadioButtonCount2\n");
                                                         
                                                         
                                                         }}
@@ -225,7 +226,7 @@ attribute2: ANDROID_SRC STR
             androidIds[numAndroidIds] = strdup(yytext);
             numAndroidIds++;
          }
-         | ANDROID_PADDING INT
+         | ANDROID_PADDING num {AndroidPadding = $2;}
          | ANDROID_PADDING STR
          | ANDROID_LAYOUT_WIDTH STR
          | ANDROID_LAYOUT_WIDTH INT
@@ -378,11 +379,10 @@ attribute7: ANDROID_ID STR
          
          ;       
     
-
-       
-
-
-
+num : INT 
+      |{printf("Error!!! Value of android:padding must be a positive integer! \n");}
+      ;
+	 
 EOL: /* nothing */
    | NL EOL
    ; 
@@ -437,6 +437,7 @@ int RadioButtonCount2 = 0;
 int radioGroupExtra = 0;
 int progress = 0;
 int max_value = 0;
+int AndroidPadding = 0;
 %}
 
 
