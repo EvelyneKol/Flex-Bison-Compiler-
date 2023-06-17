@@ -227,7 +227,6 @@ attribute2: ANDROID_SRC STR
             numAndroidIds++;
          }
          | ANDROID_PADDING num {AndroidPadding = $2;}
-         | ANDROID_PADDING STR
          | ANDROID_LAYOUT_WIDTH STR
          | ANDROID_LAYOUT_WIDTH INT
          | ANDROID_LAYOUT_HEIGHT STR
